@@ -21,10 +21,20 @@ def control_signal(signal_control,signal_handler):
   syslog.closelog()
   sys.exit()
 
+def parseArgs(arguments):
+  argsList={}
+  for argsStr in arguments:
+    print("Parametro "+ argsStr)
+
 def main():
 
   signal.signal(signal.SIGINT, control_signal)
+  parseArgs(sys.argv)
+
+  sys.exit(0)
+
   if len(sys.argv) == 1:
+    print("Los argumentos son: " + sys.argv[0])
     logaction=syslog_entry(1,syslog.LOG_DAEMON,syslog.LOG_INFO)
   else:
     logaction=syslog_entry(int(sys.argv[1]),syslog.LOG_DAEMON,syslog.LOG_INFO)
