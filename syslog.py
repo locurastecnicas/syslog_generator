@@ -12,9 +12,10 @@ class syslog_entry:
     self.priority=logpriority
 
   def printConfig(self):
-    print("Generando logs cada " + str(self.delay) + " segundos")
-    print("Registrando logs con prioridad " + str(self.priority))
-    print("Registrando logs con facility " + str(self.facility))
+    print("Using the following configuration:")
+    print(" delay = " + str(self.delay) + " secs")
+    print(" priority " + str(self.priority))
+    print(" facility " + str(self.facility))
 
 def control_signal(signal_control,signal_handler):
   print("Parando el generador de logs.")
@@ -22,22 +23,47 @@ def control_signal(signal_control,signal_handler):
   sys.exit()
 
 def parseArgs(arguments):
-  argsList={}
+  if (" ".join(arguments)).lower().find("help") != -1 or 1<len(arguments)<3:
+    print("")
+    print(" syslog_generator - v1.0")
+    print(" -----------------------")
+    print(" Generate syslog entries of different types and information.")
+    print(" If invoked without arguments the default configuration assumed is:")
+    print(" delay = 1 sec.")
+    print(" facility = LOG_INFO")
+    print(" priority = LOG_DAEMON")
+    print("============================")
+    print(" At least three arguments are required:")
+    print("  --delay=N => Number of seconds between entries.")
+    print("  --facility=FACILITY => Syslog facility used. Could be LOG_KERN, LOG_USER, LOG_MAIL, LOG_DAEMON, LOG_AUTH, LOG_LPR, LOG_NEWS, LOG_UUCP, LOG_CRON, LOG_SYSLOG and LOG_LOCAL0 to LOG_LOCAL7.")
+    print("  --piority=PRIORITY => Syslog priority of mesages. Could be LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG.")
+    print("  --help Print this screen")
+    sys.exit(0)
+
+  if len(arguments) == 1:
+    config={
+      "delay": 1,
+      "facility": syslog.LOG_INFO,
+      "priority": syslog.LOG_DAEMON
+    } 
+    print("Using default configuration:")
+    print(" delay = 1 sec.")
+    print(" facility = LOG_INFO")
+    print(" priority = LOG_DAEMON")
+    print("============================")
+
   for argsStr in arguments:
     print("Parametro "+ argsStr)
 
+  return(config)
+
 def main():
 
+  configValues={}
   signal.signal(signal.SIGINT, control_signal)
-  parseArgs(sys.argv)
+  configValues=parseArgs(sys.argv)
 
-  sys.exit(0)
-
-  if len(sys.argv) == 1:
-    print("Los argumentos son: " + sys.argv[0])
-    logaction=syslog_entry(1,syslog.LOG_DAEMON,syslog.LOG_INFO)
-  else:
-    logaction=syslog_entry(int(sys.argv[1]),syslog.LOG_DAEMON,syslog.LOG_INFO)
+  logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"])
 
   logaction.printConfig()
  
