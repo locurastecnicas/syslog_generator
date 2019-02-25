@@ -2,5 +2,5 @@ Este script genera entradas syslog. Permite especificar la prioridad, origen, de
 
 -TEMP, para simular entradas syslog procedentes de un sensor de temperatura o monitor ambiental.
 -MAIL, para simular entradas syslog generadas por un MTA.
--FIXED, para generar líneas fijas de syslog.
+-FIXED, para generar entradas con formato fijo en syslog.
 
