@@ -37,17 +37,19 @@ LOG_CONSTANTS={
 }
 
 class syslog_entry:
-  def __init__(self, secsdelay, logfacility, logpriority, entry_uuid):
+  def __init__(self, secsdelay, logfacility, logpriority, entry_uuid, entry_type):
     self.delay=secsdelay
     self.facility=logfacility
     self.priority=logpriority
     self.uuid=entry_uuid
+    self.logtype=entry_type
 
   def printConfig(self):
     print("Using the following configuration:")
-    print(" delay = " + str(self.delay) + " secs")
-    print(" priority " + str(self.priority))
-    print(" facility " + str(self.facility))
+    print(" delay => " + str(self.delay) + " secs")
+    print(" priority => " + str(self.priority))
+    print(" facility => " + str(self.facility))
+    print(" logtype => " + str(self.logtype).upper())
 
 def control_signal(signal_control,signal_handler):
   print("Parando el generador de logs.")
@@ -70,6 +72,7 @@ def parseArgs(arguments):
     print("  --delay=N => Number of seconds between entries.")
     print("  --facility=FACILITY => Syslog facility used. Could be LOG_KERN, LOG_USER, LOG_MAIL, LOG_DAEMON, LOG_AUTH, LOG_LPR, LOG_NEWS, LOG_UUCP, LOG_CRON, LOG_SYSLOG and LOG_LOCAL0 to LOG_LOCAL7.")
     print("  --piority=PRIORITY => Syslog priority of mesages. Could be LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG.")
+    print("  --type=TYPE => Log entry to simulate. Could be TEMP(temperature sensor), MAIL(MTA mail flow), FIXED(fixed string).")
     print("  --help Print this screen")
     sys.exit(0)
 
@@ -89,10 +92,10 @@ def parseArgs(arguments):
     for argumentStr in arguments:
       tempStr=argumentStr.lower().strip("--")
       tempTuple=tempStr.partition("=")
-      if tempTuple[0] == "delay":
-        config[tempTuple[0]]=tempTuple[2]
-      else:
+      if tempTuple[0] == "facility" or tempTuple[0] == "priority":
         config[tempTuple[0]]=LOG_CONSTANTS[tempTuple[2].upper()]
+      else:
+        config[tempTuple[0]]=tempTuple[2]
 
   return(config)
 
@@ -101,7 +104,7 @@ def main():
   signal.signal(signal.SIGINT, control_signal)
   configValues=parseArgs(sys.argv[1:(len(sys.argv))])
 
-  logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4())
+  logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
 
   logaction.printConfig()
 
@@ -109,9 +112,12 @@ def main():
   while 1:
     time.sleep(int(logaction.delay))
     infodate=time.ctime(time.time())
-    syslogline="%s - Linea de syslog %s"
+    if logaction.logtype.upper() == "FIXED":
+      syslogline="%s - Linea de syslog %s"
+
     print(syslogline%(infodate,logaction.uuid))
     syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
 
+## Inicio programa principal.
 if __name__ == '__main__':
   main()
