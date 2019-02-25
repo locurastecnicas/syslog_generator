@@ -114,9 +114,13 @@ def main():
     infodate=time.ctime(time.time())
     if logaction.logtype.upper() == "FIXED":
       syslogline="%s - Linea de syslog %s"
+      print(syslogline%(infodate,logaction.uuid))
+      syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
+    elif logaction.logtype.upper() == "MTA":
+      syslogline="%s - Mail send UUID=%s: SUBJECT=%s SENDER=%s DESTINATION=%s"
+      print(syslogline%(infodate,logaction.uuid,logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
+      syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid,logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
 
-    print(syslogline%(infodate,logaction.uuid))
-    syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
 
 ## Inicio programa principal.
 if __name__ == '__main__':
