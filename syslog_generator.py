@@ -117,9 +117,9 @@ def main():
       print(syslogline%(infodate,logaction.uuid))
       syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
     elif logaction.logtype.upper() == "MTA":
-      syslogline="%s - Mail send UUID=%s: SUBJECT=%s SENDER=%s DESTINATION=%s"
-      print(syslogline%(infodate,logaction.uuid,logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
-      syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid,logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
+      syslogline="%s - Mail <Message_UID>=%s: <Subject>=%s <Sender>=%s <Destination>=%s"
+      print(syslogline%(infodate,uuid.uuid4(),logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
+      syslog.syslog(logaction.priority,syslogline%(infodate,uuid.uuid4(),logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
 
 
 ## Inicio programa principal.
