@@ -50,6 +50,7 @@ class syslog_entry:
     print(" priority => " + str(self.priority))
     print(" facility => " + str(self.facility))
     print(" logtype => " + str(self.logtype).upper())
+    print("============================")
 
 def control_signal(signal_control,signal_handler):
   print("Parando el generador de logs.")
@@ -83,11 +84,6 @@ def parseArgs(arguments):
       "priority": syslog.LOG_INFO,
       "type": "FIXED"
     } 
-    print("Using default configuration:")
-    print(" delay = 1 sec.")
-    print(" facility = LOG_DAEMON")
-    print(" priority = LOG_INFO")
-    print("============================")
   else:
     config={}
     for argumentStr in arguments:
