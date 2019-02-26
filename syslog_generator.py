@@ -5,6 +5,8 @@ import sys
 import syslog
 import signal
 import uuid
+import random
+import string
 
 ## Variables globales.
 LOG_CONSTANTS={
@@ -56,6 +58,12 @@ def control_signal(signal_control,signal_handler):
   print("Parando el generador de logs.")
   syslog.closelog()
   sys.exit()
+
+def randomEmail():
+  email_domains=("@gmail.com","@yahoo.com","@microsoft.com","@msn.com","@freemail.org","@mailfree.net","@notsofreemail.com","@wannadoo.es","@terra.es","@auna.com","@madritel.es","@yourmail.net")
+  email_name="".join(random.sample(string.ascii_letters,5))
+
+  return(email_name+"@"+email_domains[random.randint(0,len(email_domains)-1)])
 
 def parseArgs(arguments):
   if (" ".join(arguments)).lower().find("help") != -1 or 1<=len(arguments)<3:
@@ -114,9 +122,9 @@ def main():
       print(syslogline%(infodate,logaction.uuid))
       syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
     elif logaction.logtype.upper() == "MTA":
-      syslogline="%s - Mail <Message_UID>=%s: <Subject>=%s <Sender>=%s <Destination>=%s"
-      print(syslogline%(infodate,uuid.uuid4(),logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
-      syslog.syslog(logaction.priority,syslogline%(infodate,uuid.uuid4(),logaction.uuid,"SENDER@SENDER.COM","DESTINATION@DESTINATION.COM"))
+      syslogline="%s - Mail event <message_uid=%s> <size=%s Kbs> <mail_subject=%s> <mail_sender=%s> <destination_address=%s>"
+      print(syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),logaction.uuid,randomEmail(),randomEmail()))
+      syslog.syslog(logaction.priority,syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),logaction.uuid,randomEmail(),randomEmail()))
 
 
 ## Inicio programa principal.
