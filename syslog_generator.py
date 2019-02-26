@@ -80,7 +80,8 @@ def parseArgs(arguments):
     config={
       "delay": 1,
       "facility": syslog.LOG_DAEMON,
-      "priority": syslog.LOG_INFO
+      "priority": syslog.LOG_INFO,
+      "type": "FIXED"
     } 
     print("Using default configuration:")
     print(" delay = 1 sec.")
