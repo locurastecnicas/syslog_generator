@@ -13,6 +13,7 @@ Cuando se ejecuta sin argumentos utiliza la siguiente configuración por defecto
 * delay = 1 segundo
 * facility = DAEMON
 * priority = INFO
+* logtype = FIXED
 
 ```
 ./syslog_generator.py
