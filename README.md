@@ -7,3 +7,19 @@ Permite especificar la prioridad, origen, delay entre entradas y tipo de entrada
 * MAIL, para simular entradas syslog generadas por un MTA. Se generan direcciones de remitente y destino aleatorias, asi como el subject.
 * FIXED, para generar entradas con formato fijo en syslog.
 
+## Usando syslog_generator
+
+Cuando se ejecuta sin argumentos utiliza la siguiente configuración por defecto:
+* delay = 1 segundo
+* facility = DAEMON
+* priority = INFO
+* logtype = FIXED
+
+```
+./syslog_generator.py
+```
+Para obtener ayuda, utilizar el argument --help:
+
+```
+./syslog_generator --help
+```
