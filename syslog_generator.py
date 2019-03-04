@@ -117,14 +117,19 @@ def main():
   while 1:
     time.sleep(int(logaction.delay))
     infodate=time.ctime(time.time())
-    if logaction.logtype.upper() == "FIXED":
-      syslogline="%s - Linea de syslog %s"
-      print(syslogline%(infodate,logaction.uuid))
-      syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
-    elif logaction.logtype.upper() == "MTA":
+    if logaction.logtype.upper() == "MTA":
       syslogline="%s - Mail event <message_uid=%s> <size=%s Kbs> <mail_subject=%s> <mail_sender=%s> <destination_address=%s>"
       print(syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),logaction.uuid,randomEmail(),randomEmail()))
       syslog.syslog(logaction.priority,syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),logaction.uuid,randomEmail(),randomEmail()))
+    elif logaction.logtype.upper() == "TEMP":
+      syslogline="%s - Temperature %.2f - sensor ID %s"
+      tValue=random.uniform(0,100)
+      print(syslogline%(infodate,tValue,logaction.uuid))
+      syslog.syslog(logaction.priority,syslogline%(infodate,tValue,logaction.uuid))
+    else:
+      syslogline="%s - Linea de syslog %s"
+      print(syslogline%(infodate,logaction.uuid))
+      syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
 
 
 ## Inicio programa principal.
