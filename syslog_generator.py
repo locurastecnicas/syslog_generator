@@ -38,6 +38,7 @@ LOG_CONSTANTS={
   "LOG_DEBUG": syslog.LOG_DEBUG
 }
 
+## Definicion clase syslog_entry.
 class syslog_entry:
   def __init__(self, secsdelay, logfacility, logpriority, entry_uuid, entry_type):
     self.delay=secsdelay
@@ -53,6 +54,26 @@ class syslog_entry:
     print(" facility => " + str(self.facility))
     print(" logtype => " + str(self.logtype).upper())
     print("============================")
+
+  def startLogger(self):
+    syslog.openlog(logoption=syslog.LOG_PID,facility=self.facility)
+    baseTemperature=random.uniform(0,100)
+    while 1:
+      time.sleep(int(self.delay))
+      infodate=time.ctime(time.time())
+      if self.logtype.upper() == "MAIL":
+        syslogline="%s - Mail event <message_uid=%s> <size=%s Kbs> <mail_subject=%s> <mail_sender=%s> <destination_address=%s>"
+        print(syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),self.uuid,randomEmail(),randomEmail()))
+        syslog.syslog(self.priority,syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),self.uuid,randomEmail(),randomEmail()))
+      elif self.logtype.upper() == "TEMP":
+        syslogline="%s - Temperature %.2f - sensor ID %s"
+        temperatureVar=random.uniform(0,10)
+        print(syslogline%(infodate,baseTemperature+temperatureVar,self.uuid))
+        syslog.syslog(self.priority,syslogline%(infodate,baseTemperature+temperatureVar,self.uuid))
+      else:
+        syslogline="%s - Linea de syslog %s"
+        print(syslogline%(infodate,self.uuid))
+        syslog.syslog(self.priority,syslogline%(infodate,self.uuid))
 
 def control_signal(signal_control,signal_handler):
   print("Parando el generador de logs.")
@@ -107,30 +128,13 @@ def parseArgs(arguments):
 def main():
 
   signal.signal(signal.SIGINT, control_signal)
+  signal.signal(signal.SIGTERM, control_signal)
   configValues=parseArgs(sys.argv[1:(len(sys.argv))])
 
   logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
-
   logaction.printConfig()
 
-  syslog.openlog(logoption=syslog.LOG_PID,facility=logaction.facility)
-  while 1:
-    time.sleep(int(logaction.delay))
-    infodate=time.ctime(time.time())
-    if logaction.logtype.upper() == "MTA":
-      syslogline="%s - Mail event <message_uid=%s> <size=%s Kbs> <mail_subject=%s> <mail_sender=%s> <destination_address=%s>"
-      print(syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),logaction.uuid,randomEmail(),randomEmail()))
-      syslog.syslog(logaction.priority,syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),logaction.uuid,randomEmail(),randomEmail()))
-    elif logaction.logtype.upper() == "TEMP":
-      syslogline="%s - Temperature %.2f - sensor ID %s"
-      tValue=random.uniform(0,100)
-      print(syslogline%(infodate,tValue,logaction.uuid))
-      syslog.syslog(logaction.priority,syslogline%(infodate,tValue,logaction.uuid))
-    else:
-      syslogline="%s - Linea de syslog %s"
-      print(syslogline%(infodate,logaction.uuid))
-      syslog.syslog(logaction.priority,syslogline%(infodate,logaction.uuid))
-
+  logaction.startLogger()
 
 ## Inicio programa principal.
 if __name__ == '__main__':
