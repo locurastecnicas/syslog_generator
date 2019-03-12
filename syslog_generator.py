@@ -90,7 +90,7 @@ def randomEmail():
   return(email_name+"@"+email_domains[random.randint(0,len(email_domains)-1)])
 
 def parseArgs(arguments):
-  if (" ".join(arguments)).lower().find("help") != -1 or 1<=len(arguments)<3:
+  if (" ".join(arguments)).lower().find("help") != -1 or 1<=len(arguments)<3 or (" ".join(arguments).count("=") % 2) != 0:
     print("")
     print(" -----------------------")
     print(" syslog_generator - v1.0")
