@@ -7,6 +7,7 @@ import signal
 import uuid
 import random
 import string
+import threading
 
 ## Variables globales.
 LOG_CONSTANTS={
@@ -39,8 +40,10 @@ LOG_CONSTANTS={
 }
 
 ## Definicion clase syslog_entry.
-class syslog_entry:
+class syslog_entry(threading.Thread):
   def __init__(self, secsdelay, logfacility, logpriority, entry_uuid, entry_type):
+    threading.Thread.__init__(self)
+    self.close_flag=threading.Event()
     self.delay=secsdelay
     self.facility=logfacility
     self.priority=logpriority
