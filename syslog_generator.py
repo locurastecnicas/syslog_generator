@@ -79,7 +79,8 @@ class syslog_entry(threading.Thread):
         syslog.syslog(self.priority,syslogline%(infodate,self.uuid))
 
 def control_signal(signal_control,signal_handler):
-  print("Parando el generador de logs.")
+  print("Stopping log generator. Please wait....")
+  print("Signal received: " + str(signal_control))
   raise ExitProgram
 
 def randomEmail():
