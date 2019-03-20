@@ -93,26 +93,46 @@ class ExitProgram(Exception):
   pass
 
 def parseArgs(arguments):
+  if (" ".join(arguments)).lower().find("examples") != -1 and len(arguments) == 1:
+    print("")
+    print(" -----------------------")
+    print(" syslog_generator - v1.0")
+    print(" -----------------------")
+    print(" Usage examples:")
+    print("  - Generate fake temperature syslog entries every 5 seconds with LOG_KERN facility and LOG_CRIT priority.")
+    print("     syslog_generator --delay=5,facility=LOG_KERN,piority=LOG_CRIT,type=TEMP")
+    print("  - Generate fake temperature syslog entries every 5 seconds with LOG_KERN facility and LOG_CRIT priority and")
+    print("    fixed syslog entries every 15 seconds with LOG_AUTH facility and LOG_INFO priority.")
+    print("     syslog_generator --delay=5,facility=LOG_KERN,piority=LOG_CRIT,type=TEMP --delay=15,facility=LOG_AUTH,piority=LOG_INFO,type=FIXED")
+    print("")
+    sys.exit(0)
+
   if (" ".join(arguments)).lower().find("help") != -1 or 1<=len(arguments)<3 or (" ".join(arguments).count("=") % 2) != 0:
     print("")
     print(" -----------------------")
     print(" syslog_generator - v1.0")
     print(" -----------------------")
     print(" Generate syslog entries of different types and information.")
-    print(" If invoked without arguments the default configuration assumed is:")
-    print(" delay    = 1 sec.")
-    print(" facility = LOG_DAEMON")
-    print(" priority = LOG_INFO")
-    print(" type     = FIXED")
+    print(" Every configuration entry defines a generator. The syntax is as follows:")
+    print("   syslog_generator --GENERATOR1_CONFIG --GENERATOR2_CONFIG .... --GENERATORN_CONFIG") 
+    print(" Four arguments are required for every GENERATOR_CONFIG separated by commas:")
+    print("  delay=N => Number of seconds between entries.")
+    print("  facility=FACILITY => Syslog facility used. Could be LOG_KERN, LOG_USER, LOG_MAIL, LOG_DAEMON, LOG_AUTH, LOG_LPR, LOG_NEWS, LOG_UUCP, LOG_CRON, LOG_SYSLOG and LOG_LOCAL0 to LOG_LOCAL7.")
+    print("  piority=PRIORITY => Syslog priority of mesages. Could be LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG.")
+    print("  type=TYPE => Log entry to simulate. Could be TEMP(temperature sensor), MAIL(MTA mail flow), FIXED(fixed string).")
+    print(" If you need help or want to check some examples try:")
+    print("  --help => Print this screen.")
+    print("  --examples => Print usage examples.") 
+    print("")
+    print(" Please note, if invoked without arguments the default configuration is:")
+    print("  delay    = 1 sec.")
+    print("  facility = LOG_DAEMON")
+    print("  priority = LOG_INFO")
+    print("  type     = FIXED")
     print("============================")
-    print(" At least four arguments are required:")
-    print("  --delay=N => Number of seconds between entries.")
-    print("  --facility=FACILITY => Syslog facility used. Could be LOG_KERN, LOG_USER, LOG_MAIL, LOG_DAEMON, LOG_AUTH, LOG_LPR, LOG_NEWS, LOG_UUCP, LOG_CRON, LOG_SYSLOG and LOG_LOCAL0 to LOG_LOCAL7.")
-    print("  --piority=PRIORITY => Syslog priority of mesages. Could be LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG.")
-    print("  --type=TYPE => Log entry to simulate. Could be TEMP(temperature sensor), MAIL(MTA mail flow), FIXED(fixed string).")
-    print("  --help Print this screen")
     print("")
     sys.exit(0)
+
 
   if len(arguments) == 0:
     config={
