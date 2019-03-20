@@ -80,14 +80,16 @@ class syslog_entry(threading.Thread):
 
 def control_signal(signal_control,signal_handler):
   print("Parando el generador de logs.")
-  syslog.closelog()
-  sys.exit()
+  raise ExitProgram
 
 def randomEmail():
   email_domains=("@gmail.com","@yahoo.com","@microsoft.com","@msn.com","@freemail.org","@mailfree.net","@notsofreemail.com","@wannadoo.es","@terra.es","@auna.com","@madritel.es","@yourmail.net")
   email_name="".join(random.sample(string.ascii_letters,5))
 
   return(email_name+"@"+email_domains[random.randint(0,len(email_domains)-1)])
+
+class ExitProgram(Exception):
+  pass
 
 def parseArgs(arguments):
   if (" ".join(arguments)).lower().find("help") != -1 or 1<=len(arguments)<3 or (" ".join(arguments).count("=") % 2) != 0:
@@ -132,14 +134,19 @@ def parseArgs(arguments):
 
 def main():
 
-  signal.signal(signal.SIGINT, control_signal)
-  signal.signal(signal.SIGTERM, control_signal)
-  configValues=parseArgs(sys.argv[1:(len(sys.argv))])
+  try:
+    signal.signal(signal.SIGINT, control_signal)
+    signal.signal(signal.SIGTERM, control_signal)
+    configValues=parseArgs(sys.argv[1:(len(sys.argv))])
 
-  logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
-  logaction.printConfig()
+    logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
+    logaction.printConfig()
 
-  logaction.startLogger()
+    logaction.startLogger()
+
+  except ExitProgram:
+    syslog.closelog()
+    sys.exit()
 
 ## Inicio programa principal.
 if __name__ == '__main__':
