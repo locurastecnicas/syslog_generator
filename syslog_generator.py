@@ -49,6 +49,8 @@ class syslog_entry(threading.Thread):
     self.priority=logpriority
     self.uuid=entry_uuid
     self.logtype=entry_type
+    self.sensorname=sensorName()
+    self.sensorip=sensorIP()
 
   def printConfig(self):
     print("Using the following configuration:")
@@ -69,19 +71,29 @@ class syslog_entry(threading.Thread):
         print(syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),self.uuid,randomEmail(),randomEmail()))
         syslog.syslog(self.priority,syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),self.uuid,randomEmail(),randomEmail()))
       elif self.logtype.upper() == "TEMP":
-        syslogline="%s - Temperature %.2f - sensor ID %s"
+        syslogline="%s - <%s> Temperature %.2f - sensor ID %s sensor IP %s"
         temperatureVar=random.uniform(0,10)
-        print(syslogline%(infodate,baseTemperature+temperatureVar,self.uuid))
-        syslog.syslog(self.priority,syslogline%(infodate,baseTemperature+temperatureVar,self.uuid))
+        print(syslogline%(infodate,self.sensorname,baseTemperature+temperatureVar,self.uuid,self.sensorip))
+        syslog.syslog(self.priority,syslogline%(infodate,self.sensorname,baseTemperature+temperatureVar,self.uuid,self.sensorip))
       else:
-        syslogline="%s - Linea de syslog %s"
-        print(syslogline%(infodate,self.uuid))
-        syslog.syslog(self.priority,syslogline%(infodate,self.uuid))
+        syslogline="%s - Linea de syslog %s - SOURCE: %s"
+        print(syslogline%(infodate,self.uuid,self.sensorip))
+        syslog.syslog(self.priority,syslogline%(infodate,self.uuid,self.sensorip))
 
 def control_signal(signal_control,signal_handler):
   print("Stopping log generator. Please wait....")
   print("Signal received: " + str(signal_control))
   raise ExitProgram
+
+def sensorName():
+  names_list=("Rack","COMS_ROOM","Server","SERVERS_ROOM","DATACENTER_COOLING")
+
+  return(names_list[random.randint(0,len(names_list)-1)])
+
+def sensorIP():
+  ip_list=("172.22.254.1","172.22.254.10","172.22.254.20","172.22.254.30","172.22.254.40","172.22.254.50","172.22.254.60","172.22.254.7","172.22.254.70")
+
+  return(ip_list[random.randint(0,len(ip_list)-1)])
 
 def randomEmail():
   email_domains=("@gmail.com","@yahoo.com","@microsoft.com","@msn.com","@freemail.org","@mailfree.net","@notsofreemail.com","@wannadoo.es","@terra.es","@auna.com","@madritel.es","@yourmail.net")
