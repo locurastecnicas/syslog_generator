@@ -62,6 +62,7 @@ class syslog_entry(threading.Thread):
 
   def startLogger(self):
     syslog.openlog(logoption=syslog.LOG_PID,facility=self.facility)
+    random.seed()
     baseTemperature=random.uniform(0,100)
     while 1:
       time.sleep(int(self.delay))
@@ -72,11 +73,12 @@ class syslog_entry(threading.Thread):
         syslog.syslog(self.priority,syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),self.uuid,randomEmail(),randomEmail()))
       elif self.logtype.upper() == "TEMP":
         syslogline="[SYSLOG_GEN] %s - <%s> Temperature %.2f - sensor ID %s sensor IP %s"
+        random.seed()
         temperatureVar=random.uniform(0,10)
         print(syslogline%(infodate,self.sensorname,baseTemperature+temperatureVar,self.uuid,self.sensorip))
         syslog.syslog(self.priority,syslogline%(infodate,self.sensorname,baseTemperature+temperatureVar,self.uuid,self.sensorip))
       else:
-        syslogline="[SYSLOG_GEN] %s - Linea de syslog %s - SOURCE: %s"
+        syslogline="[SYSLOG_GEN] %s - Syslog entry %s - SOURCE: %s"
         print(syslogline%(infodate,self.uuid,self.sensorip))
         syslog.syslog(self.priority,syslogline%(infodate,self.uuid,self.sensorip))
 
