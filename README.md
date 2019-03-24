@@ -29,5 +29,5 @@ Para obtener ayuda, utilizar el argumento --help:
 Para obtener ejemplos de uso, utilizar el argumento --examples:
 
 ```
-./syslog_generator --help
+./syslog_generator --examples
 ```
