@@ -67,16 +67,16 @@ class syslog_entry(threading.Thread):
       time.sleep(int(self.delay))
       infodate=time.ctime(time.time())
       if self.logtype.upper() == "MAIL":
-        syslogline="%s - Mail event <message_uid=%s> <size=%s Kbs> <mail_subject=%s> <mail_sender=%s> <destination_address=%s>"
+        syslogline="[SYSLOG_GEN] %s - Mail event <message_uid=%s> <size=%s Kbs> <mail_subject=%s> <mail_sender=%s> <destination_address=%s>"
         print(syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),self.uuid,randomEmail(),randomEmail()))
         syslog.syslog(self.priority,syslogline%(infodate,uuid.uuid4(),random.randint(1,100000),self.uuid,randomEmail(),randomEmail()))
       elif self.logtype.upper() == "TEMP":
-        syslogline="%s - <%s> Temperature %.2f - sensor ID %s sensor IP %s"
+        syslogline="[SYSLOG_GEN] %s - <%s> Temperature %.2f - sensor ID %s sensor IP %s"
         temperatureVar=random.uniform(0,10)
         print(syslogline%(infodate,self.sensorname,baseTemperature+temperatureVar,self.uuid,self.sensorip))
         syslog.syslog(self.priority,syslogline%(infodate,self.sensorname,baseTemperature+temperatureVar,self.uuid,self.sensorip))
       else:
-        syslogline="%s - Linea de syslog %s - SOURCE: %s"
+        syslogline="[SYSLOG_GEN] %s - Linea de syslog %s - SOURCE: %s"
         print(syslogline%(infodate,self.uuid,self.sensorip))
         syslog.syslog(self.priority,syslogline%(infodate,self.uuid,self.sensorip))
 
@@ -86,40 +86,43 @@ def control_signal(signal_control,signal_handler):
   raise ExitProgram
 
 def sensorName():
-  names_list=("Rack","COMS_ROOM","Server","SERVERS_ROOM","DATACENTER_COOLING")
+  names_list=("RACK","COMS_ROOM","SERVER","SERVERS_ROOM","DATACENTER_COOLING")
 
+  random.seed()
   return(names_list[random.randint(0,len(names_list)-1)])
 
 def sensorIP():
   ip_list=("172.22.254.1","172.22.254.10","172.22.254.20","172.22.254.30","172.22.254.40","172.22.254.50","172.22.254.60","172.22.254.7","172.22.254.70")
 
+  random.seed()
   return(ip_list[random.randint(0,len(ip_list)-1)])
 
 def randomEmail():
   email_domains=("@gmail.com","@yahoo.com","@microsoft.com","@msn.com","@freemail.org","@mailfree.net","@notsofreemail.com","@wannadoo.es","@terra.es","@auna.com","@madritel.es","@yourmail.net")
   email_name="".join(random.sample(string.ascii_letters,5))
 
+  random.seed()
   return(email_name+"@"+email_domains[random.randint(0,len(email_domains)-1)])
 
 class ExitProgram(Exception):
   pass
 
 def parseArgs(arguments):
-  if (" ".join(arguments)).lower().find("examples") != -1 and len(arguments) == 1:
+  if (arguments.lower().find("examples")) != -1:
     print("")
     print(" -----------------------")
     print(" syslog_generator - v1.0")
     print(" -----------------------")
     print(" Usage examples:")
     print("  - Generate fake temperature syslog entries every 5 seconds with LOG_KERN facility and LOG_CRIT priority.")
-    print("     syslog_generator --delay=5,facility=LOG_KERN,piority=LOG_CRIT,type=TEMP")
+    print("     syslog_generator --delay=5,facility=LOG_KERN,priority=LOG_CRIT,type=TEMP")
     print("  - Generate fake temperature syslog entries every 5 seconds with LOG_KERN facility and LOG_CRIT priority and")
     print("    fixed syslog entries every 15 seconds with LOG_AUTH facility and LOG_INFO priority.")
-    print("     syslog_generator --delay=5,facility=LOG_KERN,piority=LOG_CRIT,type=TEMP --delay=15,facility=LOG_AUTH,piority=LOG_INFO,type=FIXED")
+    print("     syslog_generator --delay=5,facility=LOG_KERN,priority=LOG_CRIT,type=TEMP --delay=15,facility=LOG_AUTH,priority=LOG_INFO,type=FIXED")
     print("")
     sys.exit(0)
 
-  if (" ".join(arguments)).lower().find("help") != -1 or 1<=len(arguments)<3 or (" ".join(arguments).count("=") % 2) != 0:
+  if (arguments.lower().find("help")) != -1 or (arguments.count("=") % 2) != 0:
     print("")
     print(" -----------------------")
     print(" syslog_generator - v1.0")
@@ -145,8 +148,7 @@ def parseArgs(arguments):
     print("")
     sys.exit(0)
 
-
-  if len(arguments) == 0:
+  if (arguments.lower().find("default")) != -1:
     config={
       "delay": 1,
       "facility": syslog.LOG_DAEMON,
@@ -155,9 +157,9 @@ def parseArgs(arguments):
     } 
   else:
     config={}
-    for argumentStr in arguments:
-      tempStr=argumentStr.lower().strip("--")
-      tempTuple=tempStr.partition("=")
+    tempStr=arguments.lower().strip("--")
+    for keyPair in tempStr.split(','):
+      tempTuple=keyPair.partition("=")
       if tempTuple[0] == "facility" or tempTuple[0] == "priority":
         config[tempTuple[0]]=LOG_CONSTANTS[tempTuple[2].upper()]
       else:
@@ -170,12 +172,18 @@ def main():
   try:
     signal.signal(signal.SIGINT, control_signal)
     signal.signal(signal.SIGTERM, control_signal)
-    configValues=parseArgs(sys.argv[1:(len(sys.argv))])
-
-    logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
-    logaction.printConfig()
-
-    logaction.startLogger()
+   
+    if (len(sys.argv)) == 1:
+      configValues=parseArgs("DEFAULT")
+      logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
+      logaction.printConfig()
+      logaction.startLogger()
+    else:
+      for argumentStr in sys.argv[1:(len(sys.argv))]:
+        configValues=parseArgs(argumentStr)
+        logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
+      logaction.printConfig()
+      logaction.startLogger()
 
   except ExitProgram:
     syslog.closelog()
