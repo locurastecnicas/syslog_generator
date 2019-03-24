@@ -1,6 +1,6 @@
 # Syslog_generator
 
-Generador de entradas para syslog/rsyslog. 
+Generador de entradas aleatorias para syslog/rsyslog. Pensado para generar trafico desde maquinas UNIX/LINUX a centralizadores de logs y pruebas de carga. 
 Permite especificar la prioridad, origen, delay entre entradas y tipo de entrada de syslog. Se distinguen los siguientes tipos de entradas:
 
 * TEMP, para simular entradas syslog procedentes de un sensor de temperatura o monitor ambiental.
@@ -9,6 +9,9 @@ Permite especificar la prioridad, origen, delay entre entradas y tipo de entrada
 
 Para los tipos MAIL y TEMP se generan diferentes campos de forma aleatoria para agregar mas informacion a cada entrada de syslog.
 
+## Requisitos
+
+Syslog_generator esta programado en Python, con lo que solo es necesario tener instalada una version de Python 2.7.12 o superior.
 
 ## Usando syslog_generator
 
@@ -30,4 +33,9 @@ Para obtener ejemplos de uso, utilizar el argumento --examples:
 
 ```
 ./syslog_generator --examples
+```
+Para generar entradas simulando un flujo de correos cada 20 segundos, con prioridad WARNING y registrandolo con la facility LOG_MAIL, la ejecucion del comando podria ser:
+
+```
+./syslog_generator --delay=20,priority=LOG_WARNING,facility=LOG_MAIL,type=MAIL
 ```
