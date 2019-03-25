@@ -60,11 +60,11 @@ class syslog_entry(threading.Thread):
     print(" logtype\t => " + str(self.logtype).upper())
     print("============================")
 
-  def startLogger(self):
+  def run(self):
     syslog.openlog(logoption=syslog.LOG_PID,facility=self.facility)
     random.seed()
     baseTemperature=random.uniform(0,100)
-    while 1:
+    while not self.close_flag.is_set():
       time.sleep(int(self.delay))
       infodate=time.ctime(time.time())
       if self.logtype.upper() == "MAIL":
@@ -81,6 +81,9 @@ class syslog_entry(threading.Thread):
         syslogline="[SYSLOG_GEN] %s - Syslog entry %s - SOURCE: %s"
         print(syslogline%(infodate,self.uuid,self.sensorip))
         syslog.syslog(self.priority,syslogline%(infodate,self.uuid,self.sensorip))
+
+    print("Closing thread: " + str(self.uuid) + "of type: " + self.logtype)
+    syslog.closelog()
 
 def control_signal(signal_control,signal_handler):
   print("Stopping log generator. Please wait....")
@@ -179,7 +182,10 @@ def main():
       configValues=parseArgs("DEFAULT")
       logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
       logaction.printConfig()
-      logaction.startLogger()
+      logaction.start()
+
+      while True:
+        time.sleep(0.5)
     else:
       for argumentStr in sys.argv[1:(len(sys.argv))]:
         configValues=parseArgs(argumentStr)
@@ -188,8 +194,12 @@ def main():
       logaction.startLogger()
 
   except ExitProgram:
+    print("Finishing logging operations.......")
+    logaction.close_flag.set()
     syslog.closelog()
-    sys.exit()
+
+  print("Closing main program.")
+  sys.exit()
 
 ## Inicio programa principal.
 if __name__ == '__main__':
