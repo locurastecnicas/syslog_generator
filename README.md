@@ -8,6 +8,8 @@ Permite especificar la prioridad, origen, delay entre entradas y tipo de entrada
 * FIXED, para generar entradas con formato fijo en syslog.
 
 Para los tipos MAIL y TEMP se generan diferentes campos de forma aleatoria para agregar mas informacion a cada entrada de syslog.
+Cada tipo de logger se lanza en un thread individual, con lo que es posible registrar cada entrada en diferentes ficheros de log de manera simultanea y
+simular flujos de log diferentes para sistemas como Elasticsearch mediante filebeat.
 
 ## Requisitos
 

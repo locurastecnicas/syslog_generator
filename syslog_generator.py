@@ -178,25 +178,30 @@ def main():
     signal.signal(signal.SIGINT, control_signal)
     signal.signal(signal.SIGTERM, control_signal)
    
+    loggers_list=[]
     if (len(sys.argv)) == 1:
       configValues=parseArgs("DEFAULT")
       logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
+      loggers_list.append(logaction)
       logaction.printConfig()
       logaction.start()
-
-      while True:
-        time.sleep(0.5)
     else:
       for argumentStr in sys.argv[1:(len(sys.argv))]:
         configValues=parseArgs(argumentStr)
         logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
-      logaction.printConfig()
-      logaction.startLogger()
+        loggers_list.append(logaction)
+        logaction.printConfig()
+        logaction.start()
+
+    while True:
+      time.sleep(0.5)
 
   except ExitProgram:
     print("Finishing logging operations.......")
-    logaction.close_flag.set()
-    syslog.closelog()
+    for logger in loggers_list:
+      logger.close_flag.set()
+      logger.join()
+      syslog.closelog()
 
   print("Closing main program.")
   sys.exit()
