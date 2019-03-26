@@ -197,6 +197,9 @@ def main():
       time.sleep(0.5)
 
   except ExitProgram:
+    for loggerThread in threading.enumerate():
+      print("Thread: " + loggerThread.getName())
+
     print("Finishing logging operations.......")
     for logger in loggers_list:
       logger.close_flag.set()
