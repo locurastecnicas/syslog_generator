@@ -29,17 +29,17 @@ Cuando se ejecuta sin argumentos utiliza la siguiente configuración por defecto
 Para obtener ayuda, utilizar el argumento --help:
 
 ```
-./syslog_generator --help
+./syslog_generator.py --help
 ```
 Para obtener ejemplos de uso, utilizar el argumento --examples:
 
 ```
-./syslog_generator --examples
+./syslog_generator.py --examples
 ```
 Para generar entradas simulando un flujo de correos cada 20 segundos, con prioridad WARNING y registrandolo con la facility LOG_MAIL, la ejecucion del comando podria ser:
 
 ```
-./syslog_generator --delay=20,priority=LOG_WARNING,facility=LOG_MAIL,type=MAIL
+./syslog_generator.py --delay=20,priority=LOG_WARNING,facility=LOG_MAIL,type=MAIL
 ```
 Con el comando anterior se crearia un thread que realizaria el registro con el tipo de entrada indicada en syslog.
 
@@ -47,5 +47,5 @@ En caso de querer generar varios registros de manera simultanea, por ejemplo el 
 entre registros de 5 segundos, la ejecucion del comando seria como la siguiente:
 
 ```
-./syslog_generator --delay=20,priority=LOG_WARNING,facility=LOG_MAIL,type=MAIL --delay=5,priority=LOG_INFO,facility=LOG_SYSLOG,type=TEMP
+./syslog_generator.py --delay=20,priority=LOG_WARNING,facility=LOG_MAIL,type=MAIL --delay=5,priority=LOG_INFO,facility=LOG_SYSLOG,type=TEMP
 ```
