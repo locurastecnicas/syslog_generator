@@ -82,7 +82,7 @@ class syslog_entry(threading.Thread):
         print(syslogline%(infodate,self.uuid,self.sensorip))
         syslog.syslog(self.priority,syslogline%(infodate,self.uuid,self.sensorip))
 
-    print("Closing thread: " + str(self.uuid) + "of type: " + self.logtype)
+    print("Closing logger thread: " + str(self.uuid) + "Logger type: " + self.logtype)
     syslog.closelog()
 
 def control_signal(signal_control,signal_handler):
@@ -201,9 +201,9 @@ def main():
     for logger in loggers_list:
       logger.close_flag.set()
       logger.join()
-      syslog.closelog()
 
   print("Closing main program.")
+  syslog.closelog()
   sys.exit()
 
 ## Inicio programa principal.
