@@ -41,3 +41,11 @@ Para generar entradas simulando un flujo de correos cada 20 segundos, con priori
 ```
 ./syslog_generator --delay=20,priority=LOG_WARNING,facility=LOG_MAIL,type=MAIL
 ```
+Con el comando anterior se crearia un thread que realizaria el registro con el tipo de entrada indicada en syslog.
+
+En caso de querer generar varios registros de manera simultanea, por ejemplo el flujo de correos anterior y adicionalmente simular un sensor de temperatura, con un intervalo
+entre registros de 5 segundos, la ejecucion del comando seria como la siguiente:
+
+```
+./syslog_generator --delay=20,priority=LOG_WARNING,facility=LOG_MAIL,type=MAIL --delay=5,priority=LOG_INFO,facility=LOG_SYSLOG,type=TEMP
+```
