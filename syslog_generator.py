@@ -82,7 +82,9 @@ class syslog_entry(threading.Thread):
         print(syslogline%(infodate,self.uuid,self.sensorip))
         syslog.syslog(self.priority,syslogline%(infodate,self.uuid,self.sensorip))
 
+    print("===============================================================")
     print("Closing logger thread: " + str(self.uuid) + "Logger type: " + self.logtype)
+    print("===============================================================")
     syslog.closelog()
 
 def control_signal(signal_control,signal_handler):
@@ -125,7 +127,7 @@ def parseArgs(arguments):
     print("    fixed syslog entries every 15 seconds with LOG_AUTH facility and LOG_INFO priority.")
     print("     syslog_generator --delay=5,facility=LOG_KERN,priority=LOG_CRIT,type=TEMP --delay=15,facility=LOG_AUTH,priority=LOG_INFO,type=FIXED")
     print("")
-    sys.exit(0)
+    sys.exit(1)
 
   if (arguments.lower().find("help")) != -1 or (arguments.count("=") % 2) != 0:
     print("")
@@ -151,7 +153,7 @@ def parseArgs(arguments):
     print("  type     = FIXED")
     print("============================")
     print("")
-    sys.exit(0)
+    sys.exit(1)
 
   if (arguments.lower().find("default")) != -1:
     config={
@@ -178,18 +180,15 @@ def main():
     signal.signal(signal.SIGINT, control_signal)
     signal.signal(signal.SIGTERM, control_signal)
    
-    loggers_list=[]
     if (len(sys.argv)) == 1:
       configValues=parseArgs("DEFAULT")
       logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
-      loggers_list.append(logaction)
       logaction.printConfig()
       logaction.start()
     else:
       for argumentStr in sys.argv[1:(len(sys.argv))]:
         configValues=parseArgs(argumentStr)
         logaction=syslog_entry(configValues["delay"],configValues["facility"],configValues["priority"],uuid.uuid4(),configValues["type"])
-        loggers_list.append(logaction)
         logaction.printConfig()
         logaction.start()
 
@@ -197,13 +196,12 @@ def main():
       time.sleep(0.5)
 
   except ExitProgram:
-    for loggerThread in threading.enumerate():
-      print("Thread: " + loggerThread.getName())
-
     print("Finishing logging operations.......")
-    for logger in loggers_list:
-      logger.close_flag.set()
-      logger.join()
+    for loggerThread in threading.enumerate():
+      if loggerThread.getName() == "MainThread":
+        continue
+      loggerThread.close_flag.set()
+      loggerThread.join()
 
   print("Closing main program.")
   syslog.closelog()
