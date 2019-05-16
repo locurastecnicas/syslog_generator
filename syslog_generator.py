@@ -87,6 +87,7 @@ class syslog_entry(threading.Thread):
     print("Closing logger thread: " + str(self.uuid) + "Logger type: " + self.logtype)
     print("===============================================================")
     syslog.closelog()
+    sys.exit(0)
 
 def control_signal(signal_control,signal_handler):
   print("Stopping log generator. Please wait....")
@@ -215,7 +216,7 @@ def main():
 
   print("Closing main program.")
   syslog.closelog()
-  sys.exit()
+  sys.exit(0)
 
 ## Inicio programa principal.
 if __name__ == '__main__':
