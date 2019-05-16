@@ -6,6 +6,7 @@ import syslog
 import signal
 import uuid
 import random
+import subprocess
 import string
 import threading
 
@@ -114,6 +115,10 @@ def randomEmail():
 class ExitProgram(Exception):
   pass
 
+class SyslogNotRunning(Exception):
+  print("Syslog is not running... champion.")
+  sys.exit(2)
+
 def parseArgs(arguments):
   if (arguments.lower().find("examples")) != -1:
     print("")
@@ -179,6 +184,11 @@ def main():
   try:
     signal.signal(signal.SIGINT, control_signal)
     signal.signal(signal.SIGTERM, control_signal)
+ 
+    # Para comprobacion de excepciones ver sys.exc_info().
+    # Comprobar si syslog esta operativo.
+    if (check_output("ps -ea | grep -i syslogd | grep -v grep | wc -l",stderr=subprocess.STDOUT,shell=True)) != '0\n':
+      raise(SyslogNotRunning) 
    
     if (len(sys.argv)) == 1:
       configValues=parseArgs("DEFAULT")
