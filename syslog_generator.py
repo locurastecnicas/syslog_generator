@@ -117,8 +117,7 @@ class ExitProgram(Exception):
   pass
 
 class SyslogNotRunning(Exception):
-  print("Syslog is not running... champion.")
-  sys.exit(2)
+  pass
 
 def parseArgs(arguments):
   if (arguments.lower().find("examples")) != -1:
@@ -188,7 +187,7 @@ def main():
  
     # Para comprobacion de excepciones ver sys.exc_info().
     # Comprobar si syslog esta operativo.
-    if (check_output("ps -ea | grep -i syslogd | grep -v grep | wc -l",stderr=subprocess.STDOUT,shell=True)) != '0\n':
+    if (subprocess.check_output("ps -ea | grep -i syslogd | grep -v grep | wc -l",stderr=subprocess.STDOUT,shell=True)) != b'1\n':
       raise(SyslogNotRunning) 
    
     if (len(sys.argv)) == 1:
@@ -213,6 +212,11 @@ def main():
         continue
       loggerThread.close_flag.set()
       loggerThread.join()
+
+  except SyslogNotRunning:
+    print("Syslog daemon is not running. Start syslog service before using syslog_generator.")
+    sys.exit(2)
+
 
   print("Closing main program.")
   syslog.closelog()
